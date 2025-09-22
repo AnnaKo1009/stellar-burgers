@@ -1,21 +1,31 @@
-import { FC, useMemo } from 'react';
+import { FC, useMemo, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { Preloader } from '../ui/preloader';
 import { OrderInfoUI } from '../ui/order-info';
 import { TIngredient } from '@utils-types';
+import { useSelector, useDispatch } from '../../services/store';
+import { selectIngredients, selectFeed } from '@selectors';
+import { getFeed } from '../../slices/feedSlice';
+import { getOrderByNumber } from '../../slices/orderSlice';
 
 export const OrderInfo: FC = () => {
-  /** TODO: взять переменные orderData и ingredients из стора */
-  const orderData = {
-    createdAt: '',
-    ingredients: [],
-    _id: '',
-    status: '',
-    name: '',
-    updatedAt: 'string',
-    number: 0
-  };
+  const { number } = useParams(); // получаем номер из URL
+  const dispatch = useDispatch();
 
-  const ingredients: TIngredient[] = [];
+  const feed = useSelector(selectFeed); // получаем feedData
+  const ingredients: TIngredient[] = useSelector(selectIngredients);
+
+  // Ищем заказ по номеру из URL в feed.orders
+  const orderData = feed?.orders.find(
+    (order) => order.number === parseInt(number!)
+  );
+
+  useEffect(() => {
+    // Загружаем заказы если их нет или feed пустой
+    if (!feed || !feed.orders.length) {
+      dispatch(getOrderByNumber(Number(number)));
+    }
+  }, [dispatch, number]);
 
   /* Готовим данные для отображения */
   const orderInfo = useMemo(() => {
