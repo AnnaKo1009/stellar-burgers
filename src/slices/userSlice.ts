@@ -107,24 +107,6 @@ const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    setAuthChecked: (state, action: PayloadAction<boolean>) => {
-      state.isAuthChecked = action.payload;
-    },
-    authCheckStart: (state) => {
-      state.isLoading = true;
-      state.error = null;
-    },
-    authCheckSuccess: (state, action: PayloadAction<TUser | null>) => {
-      state.user = action.payload;
-      state.isAuthChecked = true;
-      state.isLoading = false;
-      state.error = null;
-    },
-    authCheckFailure: (state, action: PayloadAction<string>) => {
-      state.isLoading = false;
-      state.error = action.payload;
-      state.isAuthChecked = true;
-    },
     logout: (state) => {
       state.user = null;
       state.error = null;
@@ -191,13 +173,6 @@ const userSlice = createSlice({
   }
 });
 
-export const {
-  setAuthChecked,
-  authCheckStart,
-  authCheckSuccess,
-  authCheckFailure,
-  logout,
-  clearError
-} = userSlice.actions;
+export const { logout, clearError } = userSlice.actions;
 
 export default userSlice.reducer;

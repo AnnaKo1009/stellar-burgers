@@ -16,7 +16,7 @@ import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { IngredientDetails, OrderInfo, Modal, AppHeader } from '@components';
 import { useEffect } from 'react';
 import { useDispatch } from '../../services/store';
-import { setAuthChecked } from '../../slices/userSlice';
+import { checkUserAuth } from '../../slices/userSlice';
 import { useSelector } from '../../services/store';
 import { ProtectedRoute } from '../protected-route/protected-route';
 import { selectIngredients, selectIngredientsLoading } from '@selectors';
@@ -32,7 +32,7 @@ const App = () => {
   const background = location.state?.background;
 
   useEffect(() => {
-    dispatch(setAuthChecked(true));
+    dispatch(checkUserAuth());
   }, [dispatch]);
 
   useEffect(() => {

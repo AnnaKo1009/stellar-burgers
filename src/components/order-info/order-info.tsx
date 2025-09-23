@@ -4,32 +4,33 @@ import { Preloader } from '../ui/preloader';
 import { OrderInfoUI } from '../ui/order-info';
 import { TIngredient } from '@utils-types';
 import { useSelector, useDispatch } from '../../services/store';
-import { selectIngredients, selectFeed } from '@selectors';
-import { getFeed } from '../../slices/feedSlice';
+import { selectIngredients, selectOrderModalData } from '@selectors';
 import { getOrderByNumber } from '../../slices/orderSlice';
 
 export const OrderInfo: FC = () => {
   const { number } = useParams(); // получаем номер из URL
   const dispatch = useDispatch();
 
-  const feed = useSelector(selectFeed); // получаем feedData
   const ingredients: TIngredient[] = useSelector(selectIngredients);
 
-  // Ищем заказ по номеру из URL в feed.orders
-  const orderData = feed?.orders.find(
-    (order) => order.number === parseInt(number!)
-  );
+  const orderData = useSelector(selectOrderModalData);
 
   useEffect(() => {
-    // Загружаем заказы если их нет или feed пустой
-    if (!feed || !feed.orders.length) {
+    // загружаем заказ по номеру
+    if (number) {
       dispatch(getOrderByNumber(Number(number)));
     }
   }, [dispatch, number]);
 
   /* Готовим данные для отображения */
   const orderInfo = useMemo(() => {
-    if (!orderData || !ingredients.length) return null;
+    if (
+      !orderData ||
+      !ingredients.length ||
+      orderData.number !== parseInt(number!)
+    ) {
+      return null;
+    }
 
     const date = new Date(orderData.createdAt);
 
@@ -67,7 +68,7 @@ export const OrderInfo: FC = () => {
       date,
       total
     };
-  }, [orderData, ingredients]);
+  }, [orderData, ingredients, number]);
 
   if (!orderInfo) {
     return <Preloader />;

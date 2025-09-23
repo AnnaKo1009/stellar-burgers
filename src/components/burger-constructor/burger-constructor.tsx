@@ -1,4 +1,4 @@
-import { FC, useMemo } from 'react';
+import { FC, useEffect, useMemo } from 'react';
 import { useSelector, useDispatch } from '../../services/store';
 import { BurgerConstructorUI } from '@ui';
 import { createOrder, clearOrder } from '../../slices/orderSlice';
@@ -22,6 +22,13 @@ export const BurgerConstructor: FC = () => {
   const orderRequest = useSelector(selectOrderRequest);
   const orderModalData = useSelector(selectOrderModalData);
   const orderError = useSelector(selectOrderError);
+
+  useEffect(() => {
+    // Очищаем заказ если он есть (на случай возврата на страницу)
+    if (orderModalData) {
+      dispatch(clearOrder());
+    }
+  }, [dispatch]);
 
   const onOrderClick = () => {
     if (!isAuthenticated) {

@@ -16,17 +16,19 @@ const constructorSlice = createSlice({
   name: 'constructor',
   initialState,
   reducers: {
-    addIngredient: (state, action: PayloadAction<TIngredient>) => {
-      if (action.payload.type === 'bun') {
-        state.bun = {
-          ...action.payload,
+    addIngredient: {
+      prepare: (ingredient: TIngredient) => ({
+        payload: {
+          ...ingredient,
           id: uuidv4()
-        };
-      } else {
-        state.ingredients.push({
-          ...action.payload,
-          id: uuidv4()
-        });
+        }
+      }),
+      reducer: (state, action: PayloadAction<TConstructorIngredient>) => {
+        if (action.payload.type === 'bun') {
+          state.bun = action.payload;
+        } else {
+          state.ingredients.push(action.payload);
+        }
       }
     },
     deleteIngredient: (state, action: PayloadAction<string>) => {
