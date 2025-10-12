@@ -2,15 +2,17 @@ export const testURL = 'http://localhost:4000/';
 
 describe('Burger Constructor', () => {
   beforeEach(() => {
-    cy.clearCookies();
-    cy.clearLocalStorage();
-
     cy.intercept('GET', '**/api/ingredients', {
       fixture: 'ingredients.json'
     }).as('getIngredients');
 
     cy.visit(testURL);
     cy.wait('@getIngredients');
+  });
+
+   afterEach(() => {
+    cy.clearCookies();
+    cy.clearLocalStorage();
   });
 
   describe('Модальное окно ингредиента', () => {
@@ -56,11 +58,23 @@ describe('Burger Constructor', () => {
     });
 
     it('создание заказа после авторизации', () => {
+      cy.intercept('GET', '**/api/auth/user', {
+        statusCode: 200,
+        body: {
+          success: true,
+          user: { email: 'test@test.com', name: 'Test User' }
+        }
+      }).as('getUser');
+
+      cy.setCookie('accessToken', 'mock-access-token');
+      window.localStorage.setItem('refreshToken', 'mock-refresh-token');
       cy.intercept('POST', '**/api/orders', {
         fixture: 'order.json'
       }).as('createOrder');
 
-      cy.loginUser();
+      cy.reload();
+      cy.wait('@getUser');
+
       cy.addIngredient('Краторная булка N-200i');
       cy.addIngredient('Биокотлета из марсианской Магнолии');
 
